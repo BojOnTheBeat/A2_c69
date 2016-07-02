@@ -40,7 +40,20 @@ int allocate_frame(pgtbl_entry_t *p) {
 		// Write victim page to swap, if needed, and update pagetable
 		// IMPLEMENTATION NEEDED
 
+		pgtbl_entry_t *victim = coremap[frame].pte; //Grab the pte for the victim from physical memory (i.e coremap)
 
+		unsigned int vict_frame = victim->frame //Save the frame in a var cuz I'll be modifying it below.
+
+		if (victim & PG_DIRTY){ //write to swap
+			victim->frame = victim->frame | PG_ONSWAP;
+			evict_dirty_count++;
+		}
+		else{
+			evict_clean_count++;
+		}
+
+		victim->swap_off = swap_pageout(vict_frame >> PAGE_SHIFT, victim->swap_off);
+		victim->frame &= (~PG_VALID); //set the frame to invalid. *****CrossCheck the bit mask later
 	}
 
 	// Record information for virtual page that will now be stored in frame
@@ -136,21 +149,61 @@ char *find_physpage(addr_t vaddr, char type) {
 
 	// IMPLEMENTATION NEEDED
 	// Use top-level page directory to get pointer to 2nd-level page table
-	(void)idx; // To keep compiler happy - remove when you have a real use.
+	//(void)idx; // To keep compiler happy - remove when you have a real use.
 
+	pgtbl_entry_t *2nd_level = (pgtbl_entry_t *) (pgdir[idx].pde & PAGE_MASK); 
+
+	if (!(pgdir[idx].pde & PG_VALID)){ // If not valid, initiate the second level.
+		pgdir[idx] = init_second_level();
+	}
+
+	//*****Something else to be done here?
 
 	// Use vaddr to get index into 2nd-level page table and initialize 'p'
 
-
+	p = &2nd_level[PGTBL_INDEX(vaddr)]; //pointer to the pte for vaddr
 
 	// Check if p is valid or not, on swap or not, and handle appropriately
 
+	if (!(p->frame & PG_VALID)){ //if invalid
 
+		if (!(p->frame & PG_ONSWAP)){ //if not on swap, this is the first reference
+			int frame = allocate_frame(p);
+
+			p->swap_off = INVALID_SWAP;
+			p->frame = frame << PAGE_SHIFT; //mandatory shift
+			p->frame |= PG_DIRTY;
+			init_frame(p->frame >> PAGE_SHIFT, vaddr); //shift back and inititalize
+		}
+		else{//On swap, allocate frame and read fill with data from swap
+
+			int frame = allocate_frame(p);
+			p->frame = frame << PAGE_SHIFT; //mandatory bit shift
+			p->frame |= PG_ONSWAP; //Turn on Swap bit
+
+			if(type == 'M' || type == 'S'){
+				p->frame |= PG_DIRTY; //It's been modified so turn on the dirty bit.
+			}
+			else{
+				p->frame &= (~PG_DIRTY); //**Crosscheck this
+			}
+			swap_pagein(p->frame >> PAGE_SHIFT, p->swap_off); //shift bits back
+		}
+		p->frame |= PG_VALID; //Turn on Valid bit
+		miss_count++;
+	}
+	else{ //if valid
+		if (type == 'M' || type = 'S'){
+			p->frame |= PG_DIRTY; //It's been modified so turn on the dirty bit.
+		}
+		hit_count++;
+	}
 
 	// Make sure that p is marked valid and referenced. Also mark it
 	// dirty if the access type indicates that the page will be written to.
 
-
+	p->frame |= PG_REF;
+	ref_count++;
 
 	// Call replacement algorithm's ref_fcn for this page
 	ref_fcn(p);
