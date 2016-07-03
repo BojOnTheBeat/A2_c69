@@ -23,7 +23,7 @@ int fifo_evict() {
 
 	evict_idx = current_frame;
 	current_frame++;
-	current_frame += current_frame % memsize;
+	current_frame = current_frame % memsize;
 
 	return evict_idx;
 }
