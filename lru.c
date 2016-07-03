@@ -15,6 +15,23 @@ extern struct frame *coremap;
 int counter = 0;
 
 
+int find_min(){
+	int i, min, index;
+
+	min = coremap[0].lru_counter;
+	index = 0;
+
+	for(i=1; i<memsize; i++){
+		if (coremap[i].lru_counter < min){
+			index = i;
+			min = coremap[i].lru_counter;
+		}
+	}
+
+	return index;
+}
+
+
 //algo. Use a global counter
 //add a 'counter' field to the frame struct.
 //evict the frame in coremap that has the lowest counter field
@@ -29,8 +46,9 @@ int counter = 0;
  */
 
 int lru_evict() {
-	
-	return find_min();
+	int idx;
+	idx = find_min();
+	return idx;
 }
 
 /* This function is called on each access to a page to update any information
@@ -50,21 +68,6 @@ void lru_ref(pgtbl_entry_t *p) {
 void lru_init() {
 }
 
-int find_min(){
-	int i, min, index;
-
-	min = coremap[0].counter;
-	index = 0;
-
-	for(i=1, i<memsize, i++){
-		if (coremap[i].counter < min){
-			index = i;
-			min = coremap[i].counter;
-		}
-	}
-
-	return index;
-}
 
 
 
