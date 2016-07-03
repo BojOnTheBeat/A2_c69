@@ -41,18 +41,14 @@ int allocate_frame(pgtbl_entry_t *p) {
 		// IMPLEMENTATION NEEDED
 
 		pgtbl_entry_t *victim = coremap[frame].pte; //Grab the pte for the victim from physical memory (i.e coremap)
-		printf("Got to line 44");
 		unsigned int vict_frame = victim->frame; //Save the frame in a var cuz I'll be modifying it below.
 
 		if (vict_frame & PG_DIRTY){ //write to swap
 			victim->frame = victim->frame | PG_ONSWAP;
-			printf("Got to line 49");
 			evict_dirty_count++;
 		}else{
-			printf("Got to line 52");
 			evict_clean_count++;
 		}
-		printf("Got to line 55");
 		victim->swap_off = swap_pageout(vict_frame >> PAGE_SHIFT, victim->swap_off);
 		victim->frame &= (~PG_VALID); //set the frame to invalid. *****CrossCheck the bit mask later
 	}
@@ -61,7 +57,6 @@ int allocate_frame(pgtbl_entry_t *p) {
 	coremap[frame].in_use = 1;
 	coremap[frame].pte = p;
 
-	printf("Got to line 64");
 
 	return frame;
 }
@@ -152,28 +147,22 @@ char *find_physpage(addr_t vaddr, char type) {
 
 	// IMPLEMENTATION NEEDED
 	// Use top-level page directory to get pointer to 2nd-level page table
-	pgtbl_entry_t *second_level = (pgtbl_entry_t *) (pgdir[idx].pde & PAGE_MASK); 
-	//second_level &= PAGE_MASK;
+	pgtbl_entry_t *second_level = (pgtbl_entry_t *)pgdir[idx].pde; 
 
 	if (!(pgdir[idx].pde & PG_VALID)){ // If not valid, initiate the second level.
 		pgdir[idx] = init_second_level();
 	}
 
 //**************
-	//uintptr_t mask = 
-	//second_level = (pgtbl_entry_t *) val_bit;
+	uintptr_t val_bit = (pgdir[idx].pde >> 1) << 1;
+ 	second_level = (pgtbl_entry_t *) val_bit;
 //*******
 
 
-	//*****Something else to be done here?
-
 	// Use vaddr to get index into 2nd-level page table and initialize 'p'
 
-	unsigned sec_index = PGTBL_INDEX(vaddr);
-	p = &second_level[sec_index];
-	//p = &second_level[PGTBL_INDEX(vaddr)]; //pointer to the pte for vaddr
+	p = &second_level[PGTBL_INDEX(vaddr)]; //pointer to the pte for vaddr
 
-	printf("Got to line 167");
 	// Check if p is valid or not, on swap or not, and handle appropriately
 
 	if (!(p->frame & PG_VALID)){ //if invalid
@@ -182,8 +171,6 @@ char *find_physpage(addr_t vaddr, char type) {
 			printf("calling allocate func rn");
 			int frame = allocate_frame(p);
 			
-			printf("Got to line 175");
-
 			p->frame = frame << PAGE_SHIFT; //mandatory shift
 			p->swap_off = INVALID_SWAP;
 			p->frame |= PG_DIRTY;
@@ -201,8 +188,6 @@ char *find_physpage(addr_t vaddr, char type) {
 			else{
 				p->frame &= (~PG_DIRTY); //**Crosscheck this
 
-				printf("Got to line 194");
-
 			}
 			swap_pagein(p->frame >> PAGE_SHIFT, p->swap_off); //shift bits back
 		}
@@ -213,8 +198,6 @@ char *find_physpage(addr_t vaddr, char type) {
 		if (type == 'M' || type == 'S'){
 			p->frame |= PG_DIRTY; //It's been modified so turn on the dirty bit.
 		}
-
-		printf("Got to line 207");
 		hit_count++;
 	}
 
@@ -223,8 +206,6 @@ char *find_physpage(addr_t vaddr, char type) {
 
 	p->frame |= PG_REF;
 	ref_count++;
-
-	printf("Got to line 217");
 
 	// Call replacement algorithm's ref_fcn for this page
 	ref_fcn(p);
