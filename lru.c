@@ -59,7 +59,7 @@ void lru_ref(pgtbl_entry_t *p) {
 	int i;
 	counter++;
 	for (i=0; i<memsize; i++){
-		if (coremap[i].pte->frame == p->frame){
+		if (coremap[i].pte == p){
 			coremap[i].lru_counter = counter;
 		}
 	}
