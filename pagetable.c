@@ -44,7 +44,7 @@ int allocate_frame(pgtbl_entry_t *p) {
 
 		unsigned int vict_frame = victim->frame; //Save the frame in a var cuz I'll be modifying it below.
 
-		if (victim & PG_DIRTY){ //write to swap
+		if (victim->frame & PG_DIRTY){ //write to swap
 			victim->frame = victim->frame | PG_ONSWAP;
 			evict_dirty_count++;
 		}else{
