@@ -56,8 +56,14 @@ int lru_evict() {
  * Input: The page table entry for the page that is being accessed.
  */
 void lru_ref(pgtbl_entry_t *p) {
+	int i;
 	counter++;
-	coremap[p->frame].lru_counter = counter;
+	for (i=0; i<memsize; i++){
+		if (coremap[i].pte->frame == p->frame){
+			coremap[i].lru_counter = counter;
+		}
+	}
+	//coremap[p->frame].lru_counter = counter;
 	return;
 }
 
