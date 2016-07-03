@@ -169,7 +169,9 @@ char *find_physpage(addr_t vaddr, char type) {
 
 	// Use vaddr to get index into 2nd-level page table and initialize 'p'
 
-	p = &second_level[PGTBL_INDEX(vaddr)]; //pointer to the pte for vaddr
+	unsigned sec_index = PGTBL_INDEX(vaddr);
+	p = &second_level[sec_index];
+	//p = &second_level[PGTBL_INDEX(vaddr)]; //pointer to the pte for vaddr
 
 	printf("Got to line 167");
 	// Check if p is valid or not, on swap or not, and handle appropriately
