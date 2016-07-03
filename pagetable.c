@@ -44,7 +44,7 @@ int allocate_frame(pgtbl_entry_t *p) {
 
 		unsigned int vict_frame = victim->frame; //Save the frame in a var cuz I'll be modifying it below.
 
-		if (victim->frame & PG_DIRTY){ //write to swap
+		if (vict_frame & PG_DIRTY){ //write to swap
 			victim->frame = victim->frame | PG_ONSWAP;
 			evict_dirty_count++;
 		}else{
@@ -169,8 +169,8 @@ char *find_physpage(addr_t vaddr, char type) {
 		if (!(p->frame & PG_ONSWAP)){ //if not on swap, this is the first reference
 			int frame = allocate_frame(p);
 
-			p->swap_off = INVALID_SWAP;
 			p->frame = frame << PAGE_SHIFT; //mandatory shift
+			p->swap_off = INVALID_SWAP;
 			p->frame |= PG_DIRTY;
 			init_frame(p->frame >> PAGE_SHIFT, vaddr); //shift back and inititalize
 		}
