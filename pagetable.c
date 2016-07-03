@@ -156,17 +156,18 @@ char *find_physpage(addr_t vaddr, char type) {
 	printf("Got to line 152");
 
 	pgtbl_entry_t *second_level = (pgtbl_entry_t *)pgdir[idx].pde; //& PAGE_MASK); 
+	second_level &= PAGE_MASK;
 
 	if (!(pgdir[idx].pde & PG_VALID)){ // If not valid, initiate the second level.
 		pgdir[idx] = init_second_level();
 	}
 
 //**************
-	uintptr_t val_bit = (pgdir[idx].pde >> 1) << 1;
-	second_level = (pgtbl_entry_t *) val_bit;
+	//uintptr_t val_bit = (pgdir[idx].pde >> 1) << 1;
+	//second_level = (pgtbl_entry_t *) val_bit;
 //*******
 
-	
+
 	//*****Something else to be done here?
 
 	// Use vaddr to get index into 2nd-level page table and initialize 'p'
