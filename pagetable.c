@@ -155,7 +155,7 @@ char *find_physpage(addr_t vaddr, char type) {
 	//(void)idx; // To keep compiler happy - remove when you have a real use.
 	printf("Got to line 152");
 
-	pgtbl_entry_t *second_level = (pgtbl_entry_t *)(pgdir[idx].pde & PAGE_MASK); 
+	pgtbl_entry_t *second_level = (pgtbl_entry_t *)pgdir[idx].pde; //& PAGE_MASK); 
 
 	if (!(pgdir[idx].pde & PG_VALID)){ // If not valid, initiate the second level.
 		pgdir[idx] = init_second_level();
