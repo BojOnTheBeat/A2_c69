@@ -161,7 +161,12 @@ char *find_physpage(addr_t vaddr, char type) {
 		pgdir[idx] = init_second_level();
 	}
 
+//**************
+	uintptr_t val_bit = (pgdir[idx].pde >> 1) << 1;
+	second_level = (pgtbl_entry_t *) val_bit;
+//*******
 
+	
 	//*****Something else to be done here?
 
 	// Use vaddr to get index into 2nd-level page table and initialize 'p'
