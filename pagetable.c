@@ -152,11 +152,7 @@ char *find_physpage(addr_t vaddr, char type) {
 
 	// IMPLEMENTATION NEEDED
 	// Use top-level page directory to get pointer to 2nd-level page table
-	//(void)idx; // To keep compiler happy - remove when you have a real use.
-	printf("Got to line 152");
-
-	uintptr_t mask = pgdir[idx].pde & PAGE_MASK;
-	pgtbl_entry_t *second_level = (pgtbl_entry_t *)mask; //& PAGE_MASK); 
+	pgtbl_entry_t *second_level = (pgtbl_entry_t *) (pgdir[idx].pde & PAGE_MASK); 
 	//second_level &= PAGE_MASK;
 
 	if (!(pgdir[idx].pde & PG_VALID)){ // If not valid, initiate the second level.
