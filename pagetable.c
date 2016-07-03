@@ -42,13 +42,12 @@ int allocate_frame(pgtbl_entry_t *p) {
 
 		pgtbl_entry_t *victim = coremap[frame].pte; //Grab the pte for the victim from physical memory (i.e coremap)
 
-		unsigned int vict_frame = victim->frame //Save the frame in a var cuz I'll be modifying it below.
+		unsigned int vict_frame = victim->frame; //Save the frame in a var cuz I'll be modifying it below.
 
 		if (victim & PG_DIRTY){ //write to swap
 			victim->frame = victim->frame | PG_ONSWAP;
 			evict_dirty_count++;
-		}
-		else{
+		}else{
 			evict_clean_count++;
 		}
 
@@ -193,7 +192,7 @@ char *find_physpage(addr_t vaddr, char type) {
 		miss_count++;
 	}
 	else{ //if valid
-		if (type == 'M' || type = 'S'){
+		if (type == 'M' || type == 'S'){
 			p->frame |= PG_DIRTY; //It's been modified so turn on the dirty bit.
 		}
 		hit_count++;
