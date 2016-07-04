@@ -4,10 +4,10 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include "pagetable.h"
-#include "sim.h"
+#include "sim.h" //added this 
 
 
-extern int memsize;
+//extern int memsize;
 
 extern int debug;
 
@@ -89,7 +89,7 @@ void opt_init() {
 	// the trace_array
 	while(fgets(buf, MAXLINE, tfp) != NULL){
 		if (buf[0] != '=') {
-			sscanf(bufm "%c %lx", &type, &vaddr);
+			sscanf(buf, "%c %lx", &type, &vaddr);
 			trace_array[i] = vaddr;
 			i++; //**** TODO: Add check to make sure i doesn't get out of bounds?
 		}
