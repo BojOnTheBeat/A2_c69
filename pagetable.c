@@ -168,7 +168,6 @@ char *find_physpage(addr_t vaddr, char type) {
 	if (!(p->frame & PG_VALID)){ //if invalid
 
 		if (!(p->frame & PG_ONSWAP)){ //if not on swap, this is the first reference
-			printf("calling allocate func rn");
 			int frame = allocate_frame(p);
 			
 			p->frame = frame << PAGE_SHIFT; //mandatory shift
