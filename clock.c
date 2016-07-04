@@ -47,7 +47,7 @@ void clock_ref(pgtbl_entry_t *p) {
  */
 void clock_init() {
 	int i = 0;
-	for (i=0; i<memsize, i++){
+	for (i=0; i<memsize; i++){
 		clock[i] = 0;
 	}
 }
