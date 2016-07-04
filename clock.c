@@ -12,7 +12,7 @@ extern int debug;
 
 extern struct frame *coremap;
 
-int clock[memsize];
+int *clock; //Have to use pointer instead of static array cuz compiler keeps complaining
 int hand = 0;
 
 /* Page to evict is chosen using the clock algorithm.
@@ -45,8 +45,9 @@ void clock_ref(pgtbl_entry_t *p) {
 /* Initialize any data structures needed for this replacement
  * algorithm. 
  */
-void clock_init() {
+void clock_init() { //Initialize clock array to all zeros.
 	int i = 0;
+	clock = malloc(memsize * sizeof(int));
 	for (i=0; i<memsize; i++){
 		clock[i] = 0;
 	}
