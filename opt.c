@@ -80,7 +80,7 @@ void opt_init() {
 
 	//Open tracefile for reading, as is done in sim.c
 	FILE *tfp = stdin;
-	if ((tfp = fopen(tracefile, "r")) = NULL){
+	if ((tfp = fopen(tracefile, "r")) == NULL){
 		perror("Error opening tracefile:");
 		exit(1);
 	}
