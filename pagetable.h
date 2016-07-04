@@ -66,7 +66,9 @@ struct frame {
 	pgtbl_entry_t *pte;// Pointer back to pagetable entry (pte) for page
 	                   // stored in this frame
 
-	int lru_counter;  //Counter for use in the lru replacement algorithm
+	int lru_timestamp;  // timestamp (as an int) for use in the lru replacement algorithm. The
+					   // frame with the lowest timestamp value is the least 
+					  // recently used frame(i.e the earliest).
 };
 
 /* The coremap holds information about physical memory.

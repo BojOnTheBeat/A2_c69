@@ -12,19 +12,21 @@ extern int debug;
 
 extern struct frame *coremap;
 
-int counter = 0;
+int curr_time = 0;
 
 
+//Simple helper function to find the minimum timestamp of each frame in physical memory
+//The frame with the smallest timestamp is the least recently used frame.
 int find_min(){
 	int i, min, index;
 
-	min = coremap[0].lru_counter;
+	min = coremap[0].lru_timestamp;
 	index = 0;
 
 	for(i=1; i<memsize; i++){
-		if (coremap[i].lru_counter < min){
+		if (coremap[i].lru_timestamp < min){
 			index = i;
-			min = coremap[i].lru_counter;
+			min = coremap[i].lru_timestamp;
 		}
 	}
 
@@ -32,12 +34,6 @@ int find_min(){
 }
 
 
-//algo. Use a global counter
-//add a 'counter' field to the frame struct.
-//evict the frame in coremap that has the lowest counter field
-
-//on each reference, increment counter.
-//on each reference, go to coremap[p->frame].counter and set it to counter
 
 
 /* Page to evict is chosen using the accurate LRU algorithm.
@@ -46,24 +42,25 @@ int find_min(){
  */
 
 int lru_evict() {
-	int idx;
-	idx = find_min();
-	return idx;
+	int evict_idx;
+	evict_idx = find_min(); //Evict the frame in physical memory that has the smallest timestamp.
+	return evict_idx;
 }
 
 /* This function is called on each access to a page to update any information
  * needed by the lru algorithm.
  * Input: The page table entry for the page that is being accessed.
  */
+
+ //Each time a page is accessed the glob_variable curr_time is increased and the frame of the referenced page gets the current_time.
 void lru_ref(pgtbl_entry_t *p) {
 	int i;
-	counter++;
+	curr_time++;
 	for (i=0; i<memsize; i++){
 		if (coremap[i].pte == p){
-			coremap[i].lru_counter = counter;
+			coremap[i].lru_timestamp = curr_time;
 		}
 	}
-	//coremap[p->frame].lru_counter = counter;
 	return;
 }
 
