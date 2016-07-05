@@ -71,7 +71,7 @@ int opt_evict() {
  */
 void opt_ref(pgtbl_entry_t *p) {
 
-	int ref_idx = p->frame >> PAGE_SHIFT
+	int ref_idx = p->frame >> PAGE_SHIFT;
 
 	phys_array[ref_idx] = trace_array[current_index];
 
