@@ -147,23 +147,25 @@ char *find_physpage(addr_t vaddr, char type) {
 
 	// IMPLEMENTATION NEEDED
 	// Use top-level page directory to get pointer to 2nd-level page table
-	pgtbl_entry_t *second_level = (pgtbl_entry_t *)(pgdir[idx].pde & PAGE_MASK);
 
 	if (!(pgdir[idx].pde & PG_VALID)){ // If not valid, initiate the second level.
 		pgdir[idx] = init_second_level();
 	}
 
+	pgtbl_entry_t *second_level = (pgtbl_entry_t *) (pgdir[idx].pde & PAGE_MASK);
+
+
 //**************
 	//uintptr_t val_bit = (pgdir[idx].pde >> 1) << 1;
  	//second_level = (pgtbl_entry_t *) val_bit;
 //*******
-	unsigned second_index = PGTBL_INDEX(vaddr);
+	//unsigned second_index = PGTBL_INDEX(vaddr);
 
 
 
 	// Use vaddr to get index into 2nd-level page table and initialize 'p'
 
-	p = &second_level[second_index]; //pointer to the pte for vaddr
+	p = &second_level[PGTBL_INDEX(vaddr)]; //pointer to the pte for vaddr
 
 	// Check if p is valid or not, on swap or not, and handle appropriately
 
@@ -171,11 +173,13 @@ char *find_physpage(addr_t vaddr, char type) {
 
 		if (!(p->frame & PG_ONSWAP)){ //if not on swap, this is the first reference
 			int frame = allocate_frame(p);
+
+			init_frame(frame, vaddr); //shift back and inititalize
 			
 			p->frame = frame << PAGE_SHIFT; //mandatory shift
 			p->swap_off = INVALID_SWAP;
 			p->frame |= PG_DIRTY;
-			init_frame(p->frame >> PAGE_SHIFT, vaddr); //shift back and inititalize
+			
 		}
 		else{//On swap, allocate frame and read fill with data from swap
 
@@ -187,10 +191,10 @@ char *find_physpage(addr_t vaddr, char type) {
 				p->frame |= PG_DIRTY; //It's been modified so turn on the dirty bit.
 			}
 			else{
-				p->frame &= (~PG_DIRTY); //**Crosscheck this
+				p->frame &= (~PG_DIRTY); //***Crosscheck this, study bit manip.
 
 			}
-			swap_pagein(p->frame >> PAGE_SHIFT, p->swap_off); //shift bits back
+			swap_pagein(frame, p->swap_off); //shift bits back
 		}
 		p->frame |= PG_VALID; //Turn on Valid bit
 		miss_count++;
