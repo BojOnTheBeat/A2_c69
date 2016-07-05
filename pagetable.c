@@ -147,21 +147,23 @@ char *find_physpage(addr_t vaddr, char type) {
 
 	// IMPLEMENTATION NEEDED
 	// Use top-level page directory to get pointer to 2nd-level page table
-	pgtbl_entry_t *second_level = (pgtbl_entry_t *)pgdir[idx].pde; 
+	pgtbl_entry_t *second_level = (pgtbl_entry_t *)(pgdir[idx].pde & PAGE_MASK);
 
 	if (!(pgdir[idx].pde & PG_VALID)){ // If not valid, initiate the second level.
 		pgdir[idx] = init_second_level();
 	}
 
 //**************
-	uintptr_t val_bit = (pgdir[idx].pde >> 1) << 1;
- 	second_level = (pgtbl_entry_t *) val_bit;
+	//uintptr_t val_bit = (pgdir[idx].pde >> 1) << 1;
+ 	//second_level = (pgtbl_entry_t *) val_bit;
 //*******
+	unsigned second_index = PGTBL_INDEX(vaddr);
+
 
 
 	// Use vaddr to get index into 2nd-level page table and initialize 'p'
 
-	p = &second_level[PGTBL_INDEX(vaddr)]; //pointer to the pte for vaddr
+	p = &second_level[second_index]; //pointer to the pte for vaddr
 
 	// Check if p is valid or not, on swap or not, and handle appropriately
 

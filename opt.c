@@ -33,9 +33,8 @@ int line_count = 0;
  */
 int opt_evict() {
 	//Idea:
-	// For frame in coremap
-	//   for addr in trace_array
-	//		if trace_array[addr] == coremap[frame]
+	// For frame in memory
+	//	for vaddr in 
 	//		  
 	//
 	//
@@ -60,7 +59,7 @@ int opt_evict() {
 				break; //break the inner loop cuz we've already found the next page reference
 			}
 		}
-		if (trace_idx == line_count){
+		if (trace_idx == line_count){//If we're on the last ref in the tracefile, just reaturn the current frame index.
 			return phys_idx;
 		}
 	}
@@ -78,7 +77,7 @@ void opt_ref(pgtbl_entry_t *p) {
 
 	phys_array[ref_idx] = trace_array[current_index];
 
-	current_index++;
+	current_index++;//update this so we know where we are in the trace.
 
 	return;
 }
