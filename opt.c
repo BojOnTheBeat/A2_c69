@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include "pagetable.h"
 #include "sim.h" //added this 
+#include <string.h> //added this
+
 
 //#define MAXLINE 256//added this
 //extern int memsize;
