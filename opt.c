@@ -4,12 +4,14 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include "pagetable.h"
-#include "sim.h" //added this 
+//#include "sim.h" //added this 
 
-#define MAXLINE 256
-//extern int memsize;
+#define MAXLINE 256//added this
+extern int memsize;
+extern int ref_count;//added this
 
 extern int debug;
+extern char *tracefile;//added this
 
 extern struct frame *coremap;
 
