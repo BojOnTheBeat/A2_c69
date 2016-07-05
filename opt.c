@@ -60,6 +60,9 @@ int opt_evict() {
 				break; //break the inner loop cuz we've already found the next page reference
 			}
 		}
+		if (trace_idx == line_count){
+			return phys_idx;
+		}
 	}
 	
 	return to_evict;
