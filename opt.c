@@ -5,12 +5,14 @@
 #include <stdlib.h>
 #include "pagetable.h"
 #include "sim.h" //added this 
-#include <string.h> //added this
+//#include <string.h> //added this
 
 
 //#define MAXLINE 256//added this
 //extern int memsize;
 //extern int ref_count;//added this
+
+
 
 extern int debug;
 //extern char *tracefile;//added this
@@ -20,6 +22,8 @@ extern struct frame *coremap;
 unsigned long *trace_array; //array of vaddrs that we read from the tracefile.
 
 int current_index = 0; //Updated at each reference. (By one)
+
+int line_count = 0;
 
 /* Page to evict is chosen using the optimal (aka MIN) algorithm. 
  * Returns the page frame number (which is also the index in the coremap)
@@ -45,7 +49,7 @@ int opt_evict() {
 
 	for (phys_idx=0; phys_idx<memsize; phys_idx++){
 
-		for (trace_idx=current_index; trace_idx<ref_count; trace_idx++){
+		for (trace_idx=current_index; trace_idx<line_count; trace_idx++){
 			if (trace_array[trace_idx] == (coremap[phys_idx].pte->frame >> PAGE_SHIFT)){
 				if(trace_idx > furthest){
 					furthest = trace_idx;
@@ -79,9 +83,6 @@ void opt_init() {
 	char type;
 	int i = 0;
 
-	//number of vaddrs in tracefile is given by ref_count(in pagetable.h)
-	trace_array = malloc(ref_count * sizeof(unsigned long));
-
 	//Open tracefile for reading, as is done in sim.c
 	FILE *tfp;
 	if ((tfp = fopen(tracefile, "r")) == NULL){
@@ -89,11 +90,27 @@ void opt_init() {
 		exit(1);
 	}
 
+	//Loop through to get the line count.
+	while(fgets(buf, MAXLINE, tfp) != NULL){
+		line_count++;
+	}
+
+	//number of vaddrs in tracefile is given by line_count above.
+	trace_array = malloc(line_count * sizeof(unsigned long));
+
+	fclose(tfp);//close the file first
+
+	if ((tfp = fopen(tracefile, "r")) == NULL){ //open it again
+		perror("Error opening tracefile:");
+		exit(1);
+	}
+
+
 	// Read through the trace file and safe the vaddr on each line into
 	// the trace_array
 	while(fgets(buf, MAXLINE, tfp) != NULL){
 		if (buf[0] != '=') {
-			printf("%i/n", ref_count);
+			printf("%i/n", line_count);
 			printf("we're here\n");
 			sscanf(buf, "%c %lx", &type, &vaddr);
 			trace_array[i] = vaddr;
