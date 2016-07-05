@@ -21,6 +21,8 @@ extern struct frame *coremap;
 
 unsigned long *trace_array; //array of vaddrs that we read from the tracefile.
 
+unsigned long *phys_array; //Basically a copy of coremap. Using coremap directly seems to be breaking stuff
+
 int current_index = 0; //Updated at each reference. (By one)
 
 int line_count = 0;
@@ -50,7 +52,7 @@ int opt_evict() {
 	for (phys_idx=0; phys_idx<memsize; phys_idx++){
 
 		for (trace_idx=current_index; trace_idx<line_count; trace_idx++){
-			if (trace_array[trace_idx] == (coremap[phys_idx].pte->frame >> PAGE_SHIFT)){
+			if (trace_array[trace_idx] == phys_array[phys_idx]){
 				if(trace_idx > furthest){
 					furthest = trace_idx;
 					to_evict = phys_idx;
@@ -69,6 +71,10 @@ int opt_evict() {
  */
 void opt_ref(pgtbl_entry_t *p) {
 
+	int ref_idx = p->frame >> PAGE_SHIFT
+
+	phys_array[ref_idx] = trace_array[current_index];
+
 	current_index++;
 
 	return;
@@ -82,6 +88,7 @@ void opt_init() {
 	addr_t vaddr = 0;
 	char type;
 	int i = 0;
+	phys_array = malloc(memsize * sizeof(unsigned long));
 
 	//Open tracefile for reading, as is done in sim.c
 	FILE *tfp;
@@ -110,8 +117,8 @@ void opt_init() {
 	// the trace_array
 	while(fgets(buf, MAXLINE, tfp) != NULL){
 		if (buf[0] != '=') {
-			printf("%i/n", line_count);
-			printf("we're here\n");
+			//printf("%i/n", line_count);
+			//printf("we're here\n");
 			sscanf(buf, "%c %lx", &type, &vaddr);
 			trace_array[i] = vaddr;
 			i++; //**** TODO: Add check to make sure i doesn't get out of bounds?
