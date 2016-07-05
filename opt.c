@@ -72,7 +72,7 @@ void opt_ref(pgtbl_entry_t *p) {
  * replacement algorithm.
  */
 void opt_init() {
-	char buf[MAXLINE];
+	char buf[256];
 	addr_t vaddr = 0;
 	char type;
 	int i = 0;
@@ -89,7 +89,7 @@ void opt_init() {
 
 	// Read through the trace file and safe the vaddr on each line into
 	// the trace_array
-	while(fgets(buf, MAXLINE, tfp) != NULL){
+	while(fgets(buf, 256, tfp) != NULL){
 		if (buf[0] != '=') {
 			sscanf(buf, "%c %lx", &type, &vaddr);
 			trace_array[i] = vaddr;
