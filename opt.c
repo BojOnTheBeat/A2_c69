@@ -79,7 +79,7 @@ void opt_init() {
 	trace_array = malloc(ref_count * sizeof(unsigned long));
 
 	//Open tracefile for reading, as is done in sim.c
-	FILE *tfp = stdin;
+	FILE *tfp;
 	if ((tfp = fopen(tracefile, "r")) == NULL){
 		perror("Error opening tracefile:");
 		exit(1);
