@@ -6,7 +6,7 @@
 #include "pagetable.h"
 #include "sim.h" //added this 
 
-
+#define MAXLINE 256
 //extern int memsize;
 
 extern int debug;
