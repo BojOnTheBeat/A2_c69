@@ -93,6 +93,7 @@ void opt_init() {
 	// the trace_array
 	while(fgets(buf, MAXLINE, tfp) != NULL){
 		if (buf[0] != '=') {
+			printf("we're here\n");
 			sscanf(buf, "%c %lx", &type, &vaddr);
 			trace_array[i] = vaddr;
 			i++; //**** TODO: Add check to make sure i doesn't get out of bounds?
