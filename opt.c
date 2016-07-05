@@ -4,14 +4,14 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include "pagetable.h"
-//#include "sim.h" //added this 
+#include "sim.h" //added this 
 
-#define MAXLINE 256//added this
-extern int memsize;
-extern int ref_count;//added this
+//#define MAXLINE 256//added this
+//extern int memsize;
+//extern int ref_count;//added this
 
 extern int debug;
-extern char *tracefile;//added this
+//extern char *tracefile;//added this
 
 extern struct frame *coremap;
 
@@ -72,7 +72,7 @@ void opt_ref(pgtbl_entry_t *p) {
  * replacement algorithm.
  */
 void opt_init() {
-	char buf[256];
+	char buf[MAXLINE];
 	addr_t vaddr = 0;
 	char type;
 	int i = 0;
@@ -89,7 +89,7 @@ void opt_init() {
 
 	// Read through the trace file and safe the vaddr on each line into
 	// the trace_array
-	while(fgets(buf, 256, tfp) != NULL){
+	while(fgets(buf, MAXLINE, tfp) != NULL){
 		if (buf[0] != '=') {
 			sscanf(buf, "%c %lx", &type, &vaddr);
 			trace_array[i] = vaddr;
