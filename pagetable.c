@@ -155,14 +155,6 @@ char *find_physpage(addr_t vaddr, char type) {
 	pgtbl_entry_t *second_level = (pgtbl_entry_t *) (pgdir[idx].pde & PAGE_MASK);
 
 
-//**************
-	//uintptr_t val_bit = (pgdir[idx].pde >> 1) << 1;
- 	//second_level = (pgtbl_entry_t *) val_bit;
-//*******
-	//unsigned second_index = PGTBL_INDEX(vaddr);
-
-
-
 	// Use vaddr to get index into 2nd-level page table and initialize 'p'
 
 	p = &second_level[PGTBL_INDEX(vaddr)]; //pointer to the pte for vaddr
@@ -174,7 +166,7 @@ char *find_physpage(addr_t vaddr, char type) {
 		if (!(p->frame & PG_ONSWAP)){ //if not on swap, this is the first reference
 			int frame = allocate_frame(p);
 
-			init_frame(frame, vaddr); //shift back and inititalize
+			init_frame(frame, vaddr); //inititalize
 			
 			p->frame = frame << PAGE_SHIFT; //mandatory shift
 			p->swap_off = INVALID_SWAP;
@@ -194,7 +186,7 @@ char *find_physpage(addr_t vaddr, char type) {
 				p->frame &= (~PG_DIRTY); //***Crosscheck this, study bit manip.
 
 			}
-			swap_pagein(frame, p->swap_off); //shift bits back
+			swap_pagein(frame, p->swap_off); //perform actual swap
 		}
 		p->frame |= PG_VALID; //Turn on Valid bit
 		miss_count++;
